@@ -1,0 +1,25 @@
+---
+- name: Create files using file module
+  hosts: ansible_nodes
+  gather_facts: false
+
+  tasks:
+    - name: Create a hello.txt file
+      ansible.builtin.file:
+        path: /tmp/hello.txt
+        state: touch
+
+    - name: Create multiple files with loop
+      ansible.builtin.file:
+        path: "/tmp/{{ item }}"
+        state: touch
+      loop:
+        - loop1.txt
+        - loop2.txt
+        - loop3.txt
+
+    - name: Create a file only on ansible-node1
+      ansible.builtin.file:
+        path: /tmp/special.txt
+        state: touch
+      when: inventory_hostname == "ansible-node1"
