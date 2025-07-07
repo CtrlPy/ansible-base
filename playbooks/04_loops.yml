@@ -1,0 +1,38 @@
+---
+- name: Demonstrate advanced loop usage
+  hosts: ansible_nodes
+  gather_facts: false
+
+  vars:
+    user_dirs:
+      - alex
+      - maria
+      - john
+
+    users_with_shell:
+      - name: dev1
+        shell: /bin/bash
+      - name: dev2
+        shell: /bin/zsh
+
+  tasks:
+    - name: Create user folders in /tmp
+      ansible.builtin.file:
+        path: "/tmp/{{ item }}"
+        state: directory
+        mode: "0750"
+      loop: "{{ user_dirs }}"
+      loop_control:
+        label: "{{ item }}"
+
+    - name: Create user config files with specific shell
+      ansible.builtin.copy:
+        dest: "/tmp/{{ item.name }}.cfg"
+        content: "shell={{ item.shell }}\n"
+      loop: "{{ users_with_shell }}"
+
+    - name: Nested loop example — touch multiple files in multiple folders
+      ansible.builtin.file:
+        path: "/tmp/{{ item.0 }}/{{ item.1 }}"
+        state: touch
+      loop: "{{ user_dirs | product(['notes.txt', 'log.txt']) | list }}"
